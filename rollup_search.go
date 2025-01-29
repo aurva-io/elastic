@@ -30,7 +30,7 @@ func NewRollupSearchService(client *Client) ElasticSearchService {
 }
 
 // buildURL builds the URL for the operation.
-func (s *RollupSearchService) buildURL() (string, url.Values, error) {
+func (s *RollupSearchService) BuildURL() (string, url.Values, error) {
 	var err error
 	var path string
 
