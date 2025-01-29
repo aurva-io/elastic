@@ -35,6 +35,41 @@ func (s *RollupSearchService) Index(index ...string) ElasticSearchService {
 	return s
 }
 
+func (s *RollupSearchService) FetchSourceContext(fetchSourceContext *FetchSourceContext) ElasticSearchService {
+	s.searchSource = s.searchSource.FetchSourceContext(fetchSourceContext)
+	return s
+}
+
+func (s *RollupSearchService) Query(query Query) ElasticSearchService {
+	s.searchSource = s.searchSource.Query(query)
+	return s
+}
+
+func (s *RollupSearchService) SortWithInfo(info SortInfo) ElasticSearchService {
+	s.searchSource = s.searchSource.SortWithInfo(info)
+	return s
+}
+
+func (s *RollupSearchService) From(from int) ElasticSearchService {
+	s.searchSource = s.searchSource.From(from)
+	return s
+}
+
+func (s *RollupSearchService) Size(size int) ElasticSearchService {
+	s.searchSource = s.searchSource.Size(size)
+	return s
+}
+
+func (s *RollupSearchService) Aggregation(name string, aggregation Aggregation) ElasticSearchService {
+	s.searchSource = s.searchSource.Aggregation(name, aggregation)
+	return s
+}
+
+func (s *RollupSearchService) Pretty(pretty bool) ElasticSearchService {
+	s.pretty = &pretty
+	return s
+}
+
 // buildURL builds the URL for the operation.
 func (s *RollupSearchService) BuildURL() (string, url.Values, error) {
 	var err error
