@@ -1586,11 +1586,11 @@ func (c *Client) MultiTermVectors() *MultiTermvectorService {
 // -- Search APIs --
 
 // Search is the entry point for searches.
-func (c *Client) Search(indices ...string) *SearchService {
+func (c *Client) Search(indices ...string) ElasticSearchService {
 	return NewSearchService(c).Index(indices...)
 }
 
-func (c *Client) RollupSearch(indices ...string) *RollupSearchService {
+func (c *Client) RollupSearch(indices ...string) ElasticSearchService {
 	return NewRollupSearchService(c).Index(indices...)
 }
 

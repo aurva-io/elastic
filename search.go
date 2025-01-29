@@ -53,7 +53,78 @@ type SearchService struct {
 }
 
 // NewSearchService creates a new service for searching in Elasticsearch.
-func NewSearchService(client *Client) *SearchService {
+
+type ElasticSearchService interface {
+	Pretty(pretty bool) *SearchService
+	Human(human bool) *SearchService
+	ErrorTrace(errorTrace bool) *SearchService
+	FilterPath(filterPath ...string) *SearchService
+	Header(name string, value string) *SearchService
+	Headers(headers http.Header) *SearchService
+	SearchSource(searchSource *SearchSource) *SearchService
+	Source(source interface{}) *SearchService
+	Index(index ...string) *SearchService
+	Type(typ ...string) *SearchService
+	Timeout(timeout string) *SearchService
+	Profile(profile bool) *SearchService
+	Collapse(collapse *CollapseBuilder) *SearchService
+	PointInTime(pointInTime *PointInTime) *SearchService
+	RuntimeMappings(runtimeMappings RuntimeMappings) *SearchService
+	TimeoutInMillis(timeoutInMillis int) *SearchService
+	TerminateAfter(terminateAfter int) *SearchService
+	SearchType(searchType string) *SearchService
+	Routing(routings ...string) *SearchService
+	Preference(preference string) *SearchService
+	RequestCache(requestCache bool) *SearchService
+	Query(query Query) *SearchService
+	PostFilter(postFilter Query) *SearchService
+	FetchSource(fetchSource bool) *SearchService
+	FetchSourceContext(fetchSourceContext *FetchSourceContext) *SearchService
+	Highlight(highlight *Highlight) *SearchService
+	GlobalSuggestText(globalText string) *SearchService
+	Suggester(suggester Suggester) *SearchService
+	Aggregation(name string, aggregation Aggregation) *SearchService
+	MinScore(minScore float64) *SearchService
+	From(from int) *SearchService
+	Size(size int) *SearchService
+	Explain(explain bool) *SearchService
+	Version(version bool) *SearchService
+	Sort(field string, ascending bool) *SearchService
+	SortWithInfo(info SortInfo) *SearchService
+	SortBy(sorter ...Sorter) *SearchService
+	DocvalueField(docvalueField string) *SearchService
+	DocvalueFieldWithFormat(docvalueField DocvalueField) *SearchService
+	DocvalueFields(docvalueFields ...string) *SearchService
+	DocvalueFieldsWithFormat(docvalueFields ...DocvalueField) *SearchService
+	NoStoredFields() *SearchService
+	StoredField(fieldName string) *SearchService
+	StoredFields(fields ...string) *SearchService
+	TrackScores(trackScores bool) *SearchService
+	TrackTotalHits(trackTotalHits interface{}) *SearchService
+	SearchAfter(sortValues ...interface{}) *SearchService
+	DefaultRescoreWindowSize(defaultRescoreWindowSize int) *SearchService
+	Rescorer(rescore *Rescore) *SearchService
+	IgnoreUnavailable(ignoreUnavailable bool) *SearchService
+	IgnoreThrottled(ignoreThrottled bool) *SearchService
+	AllowNoIndices(allowNoIndices bool) *SearchService
+	ExpandWildcards(expandWildcards string) *SearchService
+	Lenient(lenient bool) *SearchService
+	MaxResponseSize(maxResponseSize int64) *SearchService
+	AllowPartialSearchResults(enabled bool) *SearchService
+	TypedKeys(enabled bool) *SearchService
+	SeqNoPrimaryTerm(enabled bool) *SearchService
+	SeqNoAndPrimaryTerm(enabled bool) *SearchService
+	BatchedReduceSize(size int) *SearchService
+	MaxConcurrentShardRequests(max int) *SearchService
+	PreFilterShardSize(threshold int) *SearchService
+	RestTotalHitsAsInt(enabled bool) *SearchService
+	CCSMinimizeRoundtrips(enabled bool) *SearchService
+	Validate() error
+	Do(ctx context.Context) (*SearchResult, error)
+}
+
+// NewSearchService creates a new service for searching in Elasticsearch.
+func NewSearchService(client *Client) ElasticSearchService {
 	builder := &SearchService{
 		client:       client,
 		searchSource: NewSearchSource(),
