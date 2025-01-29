@@ -614,7 +614,7 @@ func (s *RollupSearchService) Validate() error {
 }
 
 // Do executes the search and returns a RollupSearchResult.
-func (s *RollupSearchService) Do(ctx context.Context) (*RollupSearchResult, error) {
+func (s *RollupSearchService) Do(ctx context.Context) (*SearchResult, error) {
 	// Check pre-conditions
 	if err := s.Validate(); err != nil {
 		return nil, err
@@ -650,7 +650,7 @@ func (s *RollupSearchService) Do(ctx context.Context) (*RollupSearchResult, erro
 	}
 
 	// Return search results
-	ret := new(RollupSearchResult)
+	ret := new(SearchResult)
 	if err := s.client.decoder.Decode(res.Body, ret); err != nil {
 		ret.Header = res.Header
 		return nil, err
