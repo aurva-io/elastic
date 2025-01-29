@@ -30,6 +30,11 @@ func NewRollupSearchService(client *Client) ElasticSearchService {
 	return builder
 }
 
+func (s *RollupSearchService) Index(index ...string) ElasticSearchService {
+	s.index = append(s.index, index...)
+	return s
+}
+
 // buildURL builds the URL for the operation.
 func (s *RollupSearchService) BuildURL() (string, url.Values, error) {
 	var err error
