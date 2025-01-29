@@ -5,6 +5,7 @@
 package elastic
 
 import (
+	"context"
 	"fmt"
 	"net/url"
 	"strings"
@@ -120,4 +121,49 @@ func (s *RollupSearchService) BuildURL() (string, url.Values, error) {
 		params.Set("ccs_minimize_roundtrips", fmt.Sprint(*v))
 	}
 	return path, params, nil
+}
+
+func (s *RollupSearchService) Do(ctx context.Context) (*SearchResult, error) {
+	// Check pre-conditions
+	if err := s.Validate(); err != nil {
+		return nil, err
+	}
+
+	// Get URL for request
+	path, params, err := s.BuildURL()
+	if err != nil {
+		return nil, err
+	}
+
+	// Perform request
+	var body interface{}
+	if s.source != nil {
+		body = s.source
+	} else {
+		src, err := s.searchSource.Source()
+		if err != nil {
+			return nil, err
+		}
+		body = src
+	}
+	res, err := s.client.PerformRequest(ctx, PerformRequestOptions{
+		Method:          "POST",
+		Path:            path,
+		Params:          params,
+		Body:            body,
+		Headers:         s.headers,
+		MaxResponseSize: s.maxResponseSize,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	// Return search results
+	ret := new(SearchResult)
+	if err := s.client.decoder.Decode(res.Body, ret); err != nil {
+		ret.Header = res.Header
+		return nil, err
+	}
+	ret.Header = res.Header
+	return ret, nil
 }
