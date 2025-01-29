@@ -164,9 +164,9 @@ type Client struct {
 //
 // Example:
 //
-//   client, err := elastic.NewClient(
-//     elastic.SetURL("http://127.0.0.1:9200", "http://127.0.0.1:9201"),
-//     elastic.SetBasicAuth("user", "secret"))
+//	client, err := elastic.NewClient(
+//	  elastic.SetURL("http://127.0.0.1:9200", "http://127.0.0.1:9201"),
+//	  elastic.SetBasicAuth("user", "secret"))
 //
 // If no URL is configured, Elastic uses DefaultURL by default.
 //
@@ -1586,8 +1586,12 @@ func (c *Client) MultiTermVectors() *MultiTermvectorService {
 // -- Search APIs --
 
 // Search is the entry point for searches.
-func (c *Client) Search(indices ...string) *SearchService {
+func (c *Client) Search(indices ...string) ElasticSearchService {
 	return NewSearchService(c).Index(indices...)
+}
+
+func (c *Client) RollupSearch(indices ...string) ElasticSearchService {
+	return NewRollupSearchService(c).Index(indices...)
 }
 
 // MultiSearch is the entry point for multi searches.

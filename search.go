@@ -53,7 +53,79 @@ type SearchService struct {
 }
 
 // NewSearchService creates a new service for searching in Elasticsearch.
-func NewSearchService(client *Client) *SearchService {
+
+type ElasticSearchService interface {
+	Pretty(pretty bool) ElasticSearchService
+	Human(human bool) ElasticSearchService
+	ErrorTrace(errorTrace bool) ElasticSearchService
+	FilterPath(filterPath ...string) ElasticSearchService
+	Header(name string, value string) ElasticSearchService
+	Headers(headers http.Header) ElasticSearchService
+	SearchSource(searchSource *SearchSource) ElasticSearchService
+	Source(source interface{}) ElasticSearchService
+	Index(index ...string) ElasticSearchService
+	Type(typ ...string) ElasticSearchService
+	Timeout(timeout string) ElasticSearchService
+	Profile(profile bool) ElasticSearchService
+	Collapse(collapse *CollapseBuilder) ElasticSearchService
+	PointInTime(pointInTime *PointInTime) ElasticSearchService
+	RuntimeMappings(runtimeMappings RuntimeMappings) ElasticSearchService
+	TimeoutInMillis(timeoutInMillis int) ElasticSearchService
+	TerminateAfter(terminateAfter int) ElasticSearchService
+	SearchType(searchType string) ElasticSearchService
+	Routing(routings ...string) ElasticSearchService
+	Preference(preference string) ElasticSearchService
+	RequestCache(requestCache bool) ElasticSearchService
+	Query(query Query) ElasticSearchService
+	PostFilter(postFilter Query) ElasticSearchService
+	FetchSource(fetchSource bool) ElasticSearchService
+	FetchSourceContext(fetchSourceContext *FetchSourceContext) ElasticSearchService
+	Highlight(highlight *Highlight) ElasticSearchService
+	GlobalSuggestText(globalText string) ElasticSearchService
+	Suggester(suggester Suggester) ElasticSearchService
+	Aggregation(name string, aggregation Aggregation) ElasticSearchService
+	MinScore(minScore float64) ElasticSearchService
+	From(from int) ElasticSearchService
+	Size(size int) ElasticSearchService
+	Explain(explain bool) ElasticSearchService
+	Version(version bool) ElasticSearchService
+	Sort(field string, ascending bool) ElasticSearchService
+	SortWithInfo(info SortInfo) ElasticSearchService
+	SortBy(sorter ...Sorter) ElasticSearchService
+	DocvalueField(docvalueField string) ElasticSearchService
+	DocvalueFieldWithFormat(docvalueField DocvalueField) ElasticSearchService
+	DocvalueFields(docvalueFields ...string) ElasticSearchService
+	DocvalueFieldsWithFormat(docvalueFields ...DocvalueField) ElasticSearchService
+	NoStoredFields() ElasticSearchService
+	StoredField(fieldName string) ElasticSearchService
+	StoredFields(fields ...string) ElasticSearchService
+	TrackScores(trackScores bool) ElasticSearchService
+	TrackTotalHits(trackTotalHits interface{}) ElasticSearchService
+	SearchAfter(sortValues ...interface{}) ElasticSearchService
+	DefaultRescoreWindowSize(defaultRescoreWindowSize int) ElasticSearchService
+	Rescorer(rescore *Rescore) ElasticSearchService
+	IgnoreUnavailable(ignoreUnavailable bool) ElasticSearchService
+	IgnoreThrottled(ignoreThrottled bool) ElasticSearchService
+	AllowNoIndices(allowNoIndices bool) ElasticSearchService
+	ExpandWildcards(expandWildcards string) ElasticSearchService
+	Lenient(lenient bool) ElasticSearchService
+	MaxResponseSize(maxResponseSize int64) ElasticSearchService
+	AllowPartialSearchResults(enabled bool) ElasticSearchService
+	TypedKeys(enabled bool) ElasticSearchService
+	SeqNoPrimaryTerm(enabled bool) ElasticSearchService
+	SeqNoAndPrimaryTerm(enabled bool) ElasticSearchService
+	BatchedReduceSize(size int) ElasticSearchService
+	MaxConcurrentShardRequests(max int) ElasticSearchService
+	PreFilterShardSize(threshold int) ElasticSearchService
+	RestTotalHitsAsInt(enabled bool) ElasticSearchService
+	CCSMinimizeRoundtrips(enabled bool) ElasticSearchService
+	Validate() error
+	Do(ctx context.Context) (*SearchResult, error)
+	BuildURL() (string, url.Values, error)
+}
+
+// NewSearchService creates a new service for searching in Elasticsearch.
+func NewSearchService(client *Client) ElasticSearchService {
 	builder := &SearchService{
 		client:       client,
 		searchSource: NewSearchSource(),
@@ -62,32 +134,32 @@ func NewSearchService(client *Client) *SearchService {
 }
 
 // Pretty tells Elasticsearch whether to return a formatted JSON response.
-func (s *SearchService) Pretty(pretty bool) *SearchService {
+func (s *SearchService) Pretty(pretty bool) ElasticSearchService {
 	s.pretty = &pretty
 	return s
 }
 
 // Human specifies whether human readable values should be returned in
 // the JSON response, e.g. "7.5mb".
-func (s *SearchService) Human(human bool) *SearchService {
+func (s *SearchService) Human(human bool) ElasticSearchService {
 	s.human = &human
 	return s
 }
 
 // ErrorTrace specifies whether to include the stack trace of returned errors.
-func (s *SearchService) ErrorTrace(errorTrace bool) *SearchService {
+func (s *SearchService) ErrorTrace(errorTrace bool) ElasticSearchService {
 	s.errorTrace = &errorTrace
 	return s
 }
 
 // FilterPath specifies a list of filters used to reduce the response.
-func (s *SearchService) FilterPath(filterPath ...string) *SearchService {
+func (s *SearchService) FilterPath(filterPath ...string) ElasticSearchService {
 	s.filterPath = filterPath
 	return s
 }
 
 // Header adds a header to the request.
-func (s *SearchService) Header(name string, value string) *SearchService {
+func (s *SearchService) Header(name string, value string) ElasticSearchService {
 	if s.headers == nil {
 		s.headers = http.Header{}
 	}
@@ -96,13 +168,13 @@ func (s *SearchService) Header(name string, value string) *SearchService {
 }
 
 // Headers specifies the headers of the request.
-func (s *SearchService) Headers(headers http.Header) *SearchService {
+func (s *SearchService) Headers(headers http.Header) ElasticSearchService {
 	s.headers = headers
 	return s
 }
 
 // SearchSource sets the search source builder to use with this service.
-func (s *SearchService) SearchSource(searchSource *SearchSource) *SearchService {
+func (s *SearchService) SearchSource(searchSource *SearchSource) ElasticSearchService {
 	s.searchSource = searchSource
 	if s.searchSource == nil {
 		s.searchSource = NewSearchSource()
@@ -112,13 +184,13 @@ func (s *SearchService) SearchSource(searchSource *SearchSource) *SearchService 
 
 // Source allows the user to set the request body manually without using
 // any of the structs and interfaces in Elastic.
-func (s *SearchService) Source(source interface{}) *SearchService {
+func (s *SearchService) Source(source interface{}) ElasticSearchService {
 	s.source = source
 	return s
 }
 
 // Index sets the names of the indices to use for search.
-func (s *SearchService) Index(index ...string) *SearchService {
+func (s *SearchService) Index(index ...string) ElasticSearchService {
 	s.index = append(s.index, index...)
 	return s
 }
@@ -127,13 +199,13 @@ func (s *SearchService) Index(index ...string) *SearchService {
 //
 // Deprecated: Types are in the process of being removed. Instead of using a type, prefer to
 // filter on a field on the document.
-func (s *SearchService) Type(typ ...string) *SearchService {
+func (s *SearchService) Type(typ ...string) ElasticSearchService {
 	s.typ = append(s.typ, typ...)
 	return s
 }
 
 // Timeout sets the timeout to use, e.g. "1s" or "1000ms".
-func (s *SearchService) Timeout(timeout string) *SearchService {
+func (s *SearchService) Timeout(timeout string) ElasticSearchService {
 	s.searchSource = s.searchSource.Timeout(timeout)
 	return s
 }
@@ -141,39 +213,39 @@ func (s *SearchService) Timeout(timeout string) *SearchService {
 // Profile sets the Profile API flag on the search source.
 // When enabled, a search executed by this service will return query
 // profiling data.
-func (s *SearchService) Profile(profile bool) *SearchService {
+func (s *SearchService) Profile(profile bool) ElasticSearchService {
 	s.searchSource = s.searchSource.Profile(profile)
 	return s
 }
 
 // Collapse adds field collapsing.
-func (s *SearchService) Collapse(collapse *CollapseBuilder) *SearchService {
+func (s *SearchService) Collapse(collapse *CollapseBuilder) ElasticSearchService {
 	s.searchSource = s.searchSource.Collapse(collapse)
 	return s
 }
 
 // PointInTime specifies an optional PointInTime to be used in the context
 // of this search.
-func (s *SearchService) PointInTime(pointInTime *PointInTime) *SearchService {
+func (s *SearchService) PointInTime(pointInTime *PointInTime) ElasticSearchService {
 	s.searchSource = s.searchSource.PointInTime(pointInTime)
 	return s
 }
 
 // RuntimeMappings specifies optional runtime mappings.
-func (s *SearchService) RuntimeMappings(runtimeMappings RuntimeMappings) *SearchService {
+func (s *SearchService) RuntimeMappings(runtimeMappings RuntimeMappings) ElasticSearchService {
 	s.searchSource = s.searchSource.RuntimeMappings(runtimeMappings)
 	return s
 }
 
 // TimeoutInMillis sets the timeout in milliseconds.
-func (s *SearchService) TimeoutInMillis(timeoutInMillis int) *SearchService {
+func (s *SearchService) TimeoutInMillis(timeoutInMillis int) ElasticSearchService {
 	s.searchSource = s.searchSource.TimeoutInMillis(timeoutInMillis)
 	return s
 }
 
 // TerminateAfter specifies the maximum number of documents to collect for
 // each shard, upon reaching which the query execution will terminate early.
-func (s *SearchService) TerminateAfter(terminateAfter int) *SearchService {
+func (s *SearchService) TerminateAfter(terminateAfter int) ElasticSearchService {
 	s.searchSource = s.searchSource.TerminateAfter(terminateAfter)
 	return s
 }
@@ -182,14 +254,14 @@ func (s *SearchService) TerminateAfter(terminateAfter int) *SearchService {
 // "dfs_query_then_fetch" and "query_then_fetch".
 // See https://www.elastic.co/guide/en/elasticsearch/reference/7.0/search-request-search-type.html
 // for details.
-func (s *SearchService) SearchType(searchType string) *SearchService {
+func (s *SearchService) SearchType(searchType string) ElasticSearchService {
 	s.searchType = searchType
 	return s
 }
 
 // Routing is a list of specific routing values to control the shards
 // the search will be executed on.
-func (s *SearchService) Routing(routings ...string) *SearchService {
+func (s *SearchService) Routing(routings ...string) ElasticSearchService {
 	s.routing = strings.Join(routings, ",")
 	return s
 }
@@ -199,20 +271,20 @@ func (s *SearchService) Routing(routings ...string) *SearchService {
 // local shards, "_primary" to execute on primary shards only,
 // or a custom value which guarantees that the same order will be used
 // across different requests.
-func (s *SearchService) Preference(preference string) *SearchService {
+func (s *SearchService) Preference(preference string) ElasticSearchService {
 	s.preference = preference
 	return s
 }
 
 // RequestCache indicates whether the cache should be used for this
 // request or not, defaults to index level setting.
-func (s *SearchService) RequestCache(requestCache bool) *SearchService {
+func (s *SearchService) RequestCache(requestCache bool) ElasticSearchService {
 	s.requestCache = &requestCache
 	return s
 }
 
 // Query sets the query to perform, e.g. MatchAllQuery.
-func (s *SearchService) Query(query Query) *SearchService {
+func (s *SearchService) Query(query Query) ElasticSearchService {
 	s.searchSource = s.searchSource.Query(query)
 	return s
 }
@@ -220,130 +292,130 @@ func (s *SearchService) Query(query Query) *SearchService {
 // PostFilter will be executed after the query has been executed and
 // only affects the search hits, not the aggregations.
 // This filter is always executed as the last filtering mechanism.
-func (s *SearchService) PostFilter(postFilter Query) *SearchService {
+func (s *SearchService) PostFilter(postFilter Query) ElasticSearchService {
 	s.searchSource = s.searchSource.PostFilter(postFilter)
 	return s
 }
 
 // FetchSource indicates whether the response should contain the stored
 // _source for every hit.
-func (s *SearchService) FetchSource(fetchSource bool) *SearchService {
+func (s *SearchService) FetchSource(fetchSource bool) ElasticSearchService {
 	s.searchSource = s.searchSource.FetchSource(fetchSource)
 	return s
 }
 
 // FetchSourceContext indicates how the _source should be fetched.
-func (s *SearchService) FetchSourceContext(fetchSourceContext *FetchSourceContext) *SearchService {
+func (s *SearchService) FetchSourceContext(fetchSourceContext *FetchSourceContext) ElasticSearchService {
 	s.searchSource = s.searchSource.FetchSourceContext(fetchSourceContext)
 	return s
 }
 
 // Highlight adds highlighting to the search.
-func (s *SearchService) Highlight(highlight *Highlight) *SearchService {
+func (s *SearchService) Highlight(highlight *Highlight) ElasticSearchService {
 	s.searchSource = s.searchSource.Highlight(highlight)
 	return s
 }
 
 // GlobalSuggestText defines the global text to use with all suggesters.
 // This avoids repetition.
-func (s *SearchService) GlobalSuggestText(globalText string) *SearchService {
+func (s *SearchService) GlobalSuggestText(globalText string) ElasticSearchService {
 	s.searchSource = s.searchSource.GlobalSuggestText(globalText)
 	return s
 }
 
 // Suggester adds a suggester to the search.
-func (s *SearchService) Suggester(suggester Suggester) *SearchService {
+func (s *SearchService) Suggester(suggester Suggester) ElasticSearchService {
 	s.searchSource = s.searchSource.Suggester(suggester)
 	return s
 }
 
 // Aggregation adds an aggreation to perform as part of the search.
-func (s *SearchService) Aggregation(name string, aggregation Aggregation) *SearchService {
+func (s *SearchService) Aggregation(name string, aggregation Aggregation) ElasticSearchService {
 	s.searchSource = s.searchSource.Aggregation(name, aggregation)
 	return s
 }
 
 // MinScore sets the minimum score below which docs will be filtered out.
-func (s *SearchService) MinScore(minScore float64) *SearchService {
+func (s *SearchService) MinScore(minScore float64) ElasticSearchService {
 	s.searchSource = s.searchSource.MinScore(minScore)
 	return s
 }
 
 // From index to start the search from. Defaults to 0.
-func (s *SearchService) From(from int) *SearchService {
+func (s *SearchService) From(from int) ElasticSearchService {
 	s.searchSource = s.searchSource.From(from)
 	return s
 }
 
 // Size is the number of search hits to return. Defaults to 10.
-func (s *SearchService) Size(size int) *SearchService {
+func (s *SearchService) Size(size int) ElasticSearchService {
 	s.searchSource = s.searchSource.Size(size)
 	return s
 }
 
 // Explain indicates whether each search hit should be returned with
 // an explanation of the hit (ranking).
-func (s *SearchService) Explain(explain bool) *SearchService {
+func (s *SearchService) Explain(explain bool) ElasticSearchService {
 	s.searchSource = s.searchSource.Explain(explain)
 	return s
 }
 
 // Version indicates whether each search hit should be returned with
 // a version associated to it.
-func (s *SearchService) Version(version bool) *SearchService {
+func (s *SearchService) Version(version bool) ElasticSearchService {
 	s.searchSource = s.searchSource.Version(version)
 	return s
 }
 
 // Sort adds a sort order.
-func (s *SearchService) Sort(field string, ascending bool) *SearchService {
+func (s *SearchService) Sort(field string, ascending bool) ElasticSearchService {
 	s.searchSource = s.searchSource.Sort(field, ascending)
 	return s
 }
 
 // SortWithInfo adds a sort order.
-func (s *SearchService) SortWithInfo(info SortInfo) *SearchService {
+func (s *SearchService) SortWithInfo(info SortInfo) ElasticSearchService {
 	s.searchSource = s.searchSource.SortWithInfo(info)
 	return s
 }
 
 // SortBy adds a sort order.
-func (s *SearchService) SortBy(sorter ...Sorter) *SearchService {
+func (s *SearchService) SortBy(sorter ...Sorter) ElasticSearchService {
 	s.searchSource = s.searchSource.SortBy(sorter...)
 	return s
 }
 
 // DocvalueField adds a single field to load from the field data cache
 // and return as part of the search.
-func (s *SearchService) DocvalueField(docvalueField string) *SearchService {
+func (s *SearchService) DocvalueField(docvalueField string) ElasticSearchService {
 	s.searchSource = s.searchSource.DocvalueField(docvalueField)
 	return s
 }
 
 // DocvalueFieldWithFormat adds a single field to load from the field data cache
 // and return as part of the search.
-func (s *SearchService) DocvalueFieldWithFormat(docvalueField DocvalueField) *SearchService {
+func (s *SearchService) DocvalueFieldWithFormat(docvalueField DocvalueField) ElasticSearchService {
 	s.searchSource = s.searchSource.DocvalueFieldWithFormat(docvalueField)
 	return s
 }
 
 // DocvalueFields adds one or more fields to load from the field data cache
 // and return as part of the search.
-func (s *SearchService) DocvalueFields(docvalueFields ...string) *SearchService {
+func (s *SearchService) DocvalueFields(docvalueFields ...string) ElasticSearchService {
 	s.searchSource = s.searchSource.DocvalueFields(docvalueFields...)
 	return s
 }
 
 // DocvalueFieldsWithFormat adds one or more fields to load from the field data cache
 // and return as part of the search.
-func (s *SearchService) DocvalueFieldsWithFormat(docvalueFields ...DocvalueField) *SearchService {
+func (s *SearchService) DocvalueFieldsWithFormat(docvalueFields ...DocvalueField) ElasticSearchService {
 	s.searchSource = s.searchSource.DocvalueFieldsWithFormat(docvalueFields...)
 	return s
 }
 
 // NoStoredFields indicates that no stored fields should be loaded, resulting in only
 // id and type to be returned per field.
-func (s *SearchService) NoStoredFields() *SearchService {
+func (s *SearchService) NoStoredFields() ElasticSearchService {
 	s.searchSource = s.searchSource.NoStoredFields()
 	return s
 }
@@ -351,21 +423,21 @@ func (s *SearchService) NoStoredFields() *SearchService {
 // StoredField adds a single field to load and return (note, must be stored) as
 // part of the search request. If none are specified, the source of the
 // document will be returned.
-func (s *SearchService) StoredField(fieldName string) *SearchService {
+func (s *SearchService) StoredField(fieldName string) ElasticSearchService {
 	s.searchSource = s.searchSource.StoredField(fieldName)
 	return s
 }
 
 // StoredFields	sets the fields to load and return as part of the search request.
 // If none are specified, the source of the document will be returned.
-func (s *SearchService) StoredFields(fields ...string) *SearchService {
+func (s *SearchService) StoredFields(fields ...string) ElasticSearchService {
 	s.searchSource = s.searchSource.StoredFields(fields...)
 	return s
 }
 
 // TrackScores is applied when sorting and controls if scores will be
 // tracked as well. Defaults to false.
-func (s *SearchService) TrackScores(trackScores bool) *SearchService {
+func (s *SearchService) TrackScores(trackScores bool) ElasticSearchService {
 	s.searchSource = s.searchSource.TrackScores(trackScores)
 	return s
 }
@@ -374,7 +446,7 @@ func (s *SearchService) TrackScores(trackScores bool) *SearchService {
 //
 // See https://www.elastic.co/guide/en/elasticsearch/reference/7.1/search-request-track-total-hits.html
 // for details.
-func (s *SearchService) TrackTotalHits(trackTotalHits interface{}) *SearchService {
+func (s *SearchService) TrackTotalHits(trackTotalHits interface{}) ElasticSearchService {
 	s.searchSource = s.searchSource.TrackTotalHits(trackTotalHits)
 	return s
 }
@@ -383,34 +455,34 @@ func (s *SearchService) TrackTotalHits(trackTotalHits interface{}) *SearchServic
 // using the results of the previous page to help the retrieval of the next.
 //
 // See https://www.elastic.co/guide/en/elasticsearch/reference/7.0/search-request-search-after.html
-func (s *SearchService) SearchAfter(sortValues ...interface{}) *SearchService {
+func (s *SearchService) SearchAfter(sortValues ...interface{}) ElasticSearchService {
 	s.searchSource = s.searchSource.SearchAfter(sortValues...)
 	return s
 }
 
 // DefaultRescoreWindowSize sets the rescore window size for rescores
 // that don't specify their window.
-func (s *SearchService) DefaultRescoreWindowSize(defaultRescoreWindowSize int) *SearchService {
+func (s *SearchService) DefaultRescoreWindowSize(defaultRescoreWindowSize int) ElasticSearchService {
 	s.searchSource = s.searchSource.DefaultRescoreWindowSize(defaultRescoreWindowSize)
 	return s
 }
 
 // Rescorer adds a rescorer to the search.
-func (s *SearchService) Rescorer(rescore *Rescore) *SearchService {
+func (s *SearchService) Rescorer(rescore *Rescore) ElasticSearchService {
 	s.searchSource = s.searchSource.Rescorer(rescore)
 	return s
 }
 
 // IgnoreUnavailable indicates whether the specified concrete indices
 // should be ignored when unavailable (missing or closed).
-func (s *SearchService) IgnoreUnavailable(ignoreUnavailable bool) *SearchService {
+func (s *SearchService) IgnoreUnavailable(ignoreUnavailable bool) ElasticSearchService {
 	s.ignoreUnavailable = &ignoreUnavailable
 	return s
 }
 
 // IgnoreThrottled indicates whether specified concrete, expanded or aliased
 // indices should be ignored when throttled.
-func (s *SearchService) IgnoreThrottled(ignoreThrottled bool) *SearchService {
+func (s *SearchService) IgnoreThrottled(ignoreThrottled bool) ElasticSearchService {
 	s.ignoreThrottled = &ignoreThrottled
 	return s
 }
@@ -418,42 +490,42 @@ func (s *SearchService) IgnoreThrottled(ignoreThrottled bool) *SearchService {
 // AllowNoIndices indicates whether to ignore if a wildcard indices
 // expression resolves into no concrete indices. (This includes `_all` string
 // or when no indices have been specified).
-func (s *SearchService) AllowNoIndices(allowNoIndices bool) *SearchService {
+func (s *SearchService) AllowNoIndices(allowNoIndices bool) ElasticSearchService {
 	s.allowNoIndices = &allowNoIndices
 	return s
 }
 
 // ExpandWildcards indicates whether to expand wildcard expression to
 // concrete indices that are open, closed or both.
-func (s *SearchService) ExpandWildcards(expandWildcards string) *SearchService {
+func (s *SearchService) ExpandWildcards(expandWildcards string) ElasticSearchService {
 	s.expandWildcards = expandWildcards
 	return s
 }
 
 // Lenient specifies whether format-based query failures (such as providing
 // text to a numeric field) should be ignored.
-func (s *SearchService) Lenient(lenient bool) *SearchService {
+func (s *SearchService) Lenient(lenient bool) ElasticSearchService {
 	s.lenient = &lenient
 	return s
 }
 
 // MaxResponseSize sets an upper limit on the response body size that we accept,
 // to guard against OOM situations.
-func (s *SearchService) MaxResponseSize(maxResponseSize int64) *SearchService {
+func (s *SearchService) MaxResponseSize(maxResponseSize int64) ElasticSearchService {
 	s.maxResponseSize = maxResponseSize
 	return s
 }
 
 // AllowPartialSearchResults indicates if an error should be returned if
 // there is a partial search failure or timeout.
-func (s *SearchService) AllowPartialSearchResults(enabled bool) *SearchService {
+func (s *SearchService) AllowPartialSearchResults(enabled bool) ElasticSearchService {
 	s.allowPartialSearchResults = &enabled
 	return s
 }
 
 // TypedKeys specifies whether aggregation and suggester names should be
 // prefixed by their respective types in the response.
-func (s *SearchService) TypedKeys(enabled bool) *SearchService {
+func (s *SearchService) TypedKeys(enabled bool) ElasticSearchService {
 	s.typedKeys = &enabled
 	return s
 }
@@ -461,13 +533,13 @@ func (s *SearchService) TypedKeys(enabled bool) *SearchService {
 // SeqNoPrimaryTerm is an alias for SeqNoAndPrimaryTerm.
 //
 // Deprecated: Use SeqNoAndPrimaryTerm.
-func (s *SearchService) SeqNoPrimaryTerm(enabled bool) *SearchService {
+func (s *SearchService) SeqNoPrimaryTerm(enabled bool) ElasticSearchService {
 	return s.SeqNoAndPrimaryTerm(enabled)
 }
 
 // SeqNoAndPrimaryTerm specifies whether to return sequence number and
 // primary term of the last modification of each hit.
-func (s *SearchService) SeqNoAndPrimaryTerm(enabled bool) *SearchService {
+func (s *SearchService) SeqNoAndPrimaryTerm(enabled bool) ElasticSearchService {
 	s.seqNoPrimaryTerm = &enabled
 	return s
 }
@@ -476,7 +548,7 @@ func (s *SearchService) SeqNoAndPrimaryTerm(enabled bool) *SearchService {
 // at once on the coordinating node. This value should be used as a protection
 // mechanism to reduce the memory overhead per search request if the potential
 // number of shards in the request can be large.
-func (s *SearchService) BatchedReduceSize(size int) *SearchService {
+func (s *SearchService) BatchedReduceSize(size int) ElasticSearchService {
 	s.batchedReduceSize = &size
 	return s
 }
@@ -485,7 +557,7 @@ func (s *SearchService) BatchedReduceSize(size int) *SearchService {
 // this search executes concurrently. This value should be used to limit the
 // impact of the search on the cluster in order to limit the number of
 // concurrent shard requests.
-func (s *SearchService) MaxConcurrentShardRequests(max int) *SearchService {
+func (s *SearchService) MaxConcurrentShardRequests(max int) ElasticSearchService {
 	s.maxConcurrentShardRequests = &max
 	return s
 }
@@ -496,27 +568,27 @@ func (s *SearchService) MaxConcurrentShardRequests(max int) *SearchService {
 // can limit the number of shards significantly if for instance a shard can
 // not match any documents based on it's rewrite method i.e. if date filters are
 // mandatory to match but the shard bounds and the query are disjoint.
-func (s *SearchService) PreFilterShardSize(threshold int) *SearchService {
+func (s *SearchService) PreFilterShardSize(threshold int) ElasticSearchService {
 	s.preFilterShardSize = &threshold
 	return s
 }
 
 // RestTotalHitsAsInt indicates whether hits.total should be rendered as an
 // integer or an object in the rest search response.
-func (s *SearchService) RestTotalHitsAsInt(enabled bool) *SearchService {
+func (s *SearchService) RestTotalHitsAsInt(enabled bool) ElasticSearchService {
 	s.restTotalHitsAsInt = &enabled
 	return s
 }
 
 // CCSMinimizeRoundtrips indicates whether network round-trips should be minimized
 // as part of cross-cluster search requests execution.
-func (s *SearchService) CCSMinimizeRoundtrips(enabled bool) *SearchService {
+func (s *SearchService) CCSMinimizeRoundtrips(enabled bool) ElasticSearchService {
 	s.ccsMinimizeRoundtrips = &enabled
 	return s
 }
 
 // buildURL builds the URL for the operation.
-func (s *SearchService) buildURL() (string, url.Values, error) {
+func (s *SearchService) BuildURL() (string, url.Values, error) {
 	var err error
 	var path string
 
@@ -621,7 +693,7 @@ func (s *SearchService) Do(ctx context.Context) (*SearchResult, error) {
 	}
 
 	// Get URL for request
-	path, params, err := s.buildURL()
+	path, params, err := s.BuildURL()
 	if err != nil {
 		return nil, err
 	}
